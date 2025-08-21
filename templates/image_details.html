@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da Imagem - Agromérica IA</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: 'Maven Pro', sans-serif;
+            background-color: #f4f7f6;
+        }
+        .company-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+        }
+        .card-header {
+            background-color: #2E7D32; /* Um verde mais alinhado com "agro" */
+            color: #ffffff;
+            border-bottom: none;
+            border-top-left-radius: calc(0.5rem - 1px);
+            border-top-right-radius: calc(0.5rem - 1px);
+        }
+        .card-title {
+            font-weight: 500;
+        }
+        .detection-results pre {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            color: #1b5e20;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.875em;
+        }
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            border-radius: 0.2rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="company-header text-center py-2 bg-white shadow-sm">
+        <div class="container">
+            <a href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='img/agromerica.png') }}" alt="Logo da Empresa" style="max-height: 40px;">
+            </a>
+        </div>
+    </header>
+
+    <div class="container mt-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h4 mb-0">Detalhes da Análise</h1>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i>Voltar
+            </a>
+        </div>
+
+        <div class="row">
+            <!-- Coluna da Esquerda: Imagem e Detalhes -->
+            <div class="col-lg-8">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0 fs-6">Imagem Processada</h5>
+                    </div>
+                    <div class="card-body text-center p-2">
+                        <img src="{{ url_for('static', filename=image.processed_image_path.replace('static/', '')) }}" 
+                             class="img-fluid rounded" alt="Imagem Processada">
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0 fs-6">Informações da Detecção</h5>
+                    </div>
+                    <div class="card-body p-3">
+                        <p class="mb-1"><strong>Data e Hora:</strong> {{ image.timestamp.strftime('%d/%m/%Y %H:%M:%S') }}</p>
+                        <p class="mb-2"><strong>Nome do Arquivo:</strong> <code class="text-dark bg-light p-1 rounded">{{ image.filename }}</code></p>
+                        <div class="detection-results mt-2">
+                            <h6 class="card-subtitle mb-1 text-muted">Resultados da Detecção (JSON)</h6>
+                            <pre class="bg-light p-2 rounded" style="max-height: 150px; overflow-y: auto;"><code>{{ image.detection_results | tojson(indent=2) }}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna da Direita: Inventário -->
+            <div class="col-lg-4">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0 fs-6"><i class="fas fa-boxes-stacked me-2"></i>Inventário de Peças</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if parts %}
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="ps-3">Peça</th>
+                                    <th scope="col" class="text-center">Quantidade</th>
+                                    <th scope="col" class="text-center">Status</th>
+                                    <th scope="col" class="text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for part in parts %}
+                                <tr>
+                                    <td class="ps-3">{{ part.name }}</td>
+                                    <td class="text-center">{{ part.quantity }}</td>
+                                    <td class="text-center">
+                                        {% if part.in_stock %}
+                                            <span class="badge bg-success">Em estoque</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Sem estoque</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <form action="{{ url_for('update_part_quantity', part_id=part.id) }}" method="POST" class="d-flex justify-content-center align-items-center" style="gap:.5rem">
+                                            <input name="quantity" type="number" min="0" value="{{ part.quantity }}" class="form-control form-control-sm" style="width:5.5rem">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">Salvar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-center text-muted p-3">Nenhuma peça no inventário ainda.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 text-center mb-3">
+                <form action="{{ url_for('delete_image', image_id=image.id) }}" method="POST" 
+                      onsubmit="return confirm('Tem certeza que deseja excluir esta imagem?');">
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash-alt me-1"></i>Excluir Análise
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+nohup: ignorando entrada
+INFO:__main__:Iniciando servidor Flask...
+ * Serving Flask app 'app'
+ * Debug mode: on
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5052
+ * Running on http://10.64.101.33:5052
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+INFO:__main__:Iniciando servidor Flask...
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 120-951-678
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:48:51] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:48:51] "[36mGET /static/img/agromerica.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:48:51] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:48:51] "[36mGET /static/js/app.js HTTP/1.1[0m" 304 -
+INFO:__main__:Imagem salva em: /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_104855_photo.jpg
+INFO:__main__:Iniciando processamento da imagem: /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_104855_photo.jpg
+
+image 1/1 /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_104855_photo.jpg: 640x480 1 obstaculo_limpeza, 73.2ms
+Speed: 2.0ms preprocess, 73.2ms inference, 1.2ms postprocess per image at shape (1, 3, 640, 480)
+INFO:__main__:Imagem processada e salva em: /home/fifo/Área de trabalho/docker-agro-master/static/results/processed_image_20250820_104855_photo.jpg
+WARNING ⚠️ 'result.tojson()' is deprecated, replace with 'result.to_json()'.
+INFO:__main__:Peça com maior confiança: obstaculo_limpeza (0.93)
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:48:56] "POST /upload HTTP/1.1" 200 -
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:48:56] "GET /static/results/processed_image_20250820_104855_photo.jpg?cb=1755697736272 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:49:09] "GET /image/109 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:49:09] "GET /static/img/agromerica.png HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:49:09] "GET /static/results/processed_image_20250820_104704_photo.jpg HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:49:09] "GET /static/css/style.css HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:49:09] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:49:14] "[32mPOST /part/1/update HTTP/1.1[0m" 302 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:49:14] "GET /image/109 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:49:14] "[36mGET /static/img/agromerica.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:49:14] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:49:14] "[36mGET /static/results/processed_image_20250820_104704_photo.jpg HTTP/1.1[0m" 304 -
+INFO:__main__:Imagem salva em: /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_104919_photo.jpg
+INFO:__main__:Iniciando processamento da imagem: /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_104919_photo.jpg
+
+image 1/1 /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_104919_photo.jpg: 640x480 1 obstaculo_limpeza, 78.7ms
+Speed: 23.8ms preprocess, 78.7ms inference, 0.7ms postprocess per image at shape (1, 3, 640, 480)
+INFO:__main__:Imagem processada e salva em: /home/fifo/Área de trabalho/docker-agro-master/static/results/processed_image_20250820_104919_photo.jpg
+WARNING ⚠️ 'result.tojson()' is deprecated, replace with 'result.to_json()'.
+INFO:__main__:Peça com maior confiança: obstaculo_limpeza (0.93)
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:49:19] "POST /upload HTTP/1.1" 200 -
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:49:19] "GET /static/results/processed_image_20250820_104919_photo.jpg?cb=1755697759905 HTTP/1.1" 200 -
+INFO:__main__:Imagem salva em: /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_104947_photo.jpg
+INFO:__main__:Iniciando processamento da imagem: /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_104947_photo.jpg
+
+image 1/1 /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_104947_photo.jpg: 640x480 1 roda_bipartida, 52.4ms
+Speed: 3.3ms preprocess, 52.4ms inference, 0.9ms postprocess per image at shape (1, 3, 640, 480)
+INFO:__main__:Imagem processada e salva em: /home/fifo/Área de trabalho/docker-agro-master/static/results/processed_image_20250820_104947_photo.jpg
+WARNING ⚠️ 'result.tojson()' is deprecated, replace with 'result.to_json()'.
+INFO:__main__:Peça com maior confiança: roda_bipartida (0.60)
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:49:47] "POST /upload HTTP/1.1" 200 -
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:49:47] "GET /static/results/processed_image_20250820_104947_photo.jpg?cb=1755697787219 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:52:11] "HEAD /image/109 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:52:33] "GET /image/109 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:52:33] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:52:33] "[36mGET /static/img/agromerica.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [20/Aug/2025 10:52:33] "[36mGET /static/results/processed_image_20250820_104704_photo.jpg HTTP/1.1[0m" 304 -
+INFO:__main__:Imagem salva em: /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_105239_photo.jpg
+INFO:__main__:Iniciando processamento da imagem: /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_105239_photo.jpg
+
+image 1/1 /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_105239_photo.jpg: 640x480 1 junta_cria, 59.5ms
+Speed: 4.4ms preprocess, 59.5ms inference, 1.3ms postprocess per image at shape (1, 3, 640, 480)
+INFO:__main__:Imagem processada e salva em: /home/fifo/Área de trabalho/docker-agro-master/static/results/processed_image_20250820_105239_photo.jpg
+WARNING ⚠️ 'result.tojson()' is deprecated, replace with 'result.to_json()'.
+INFO:__main__:Peça com maior confiança: junta_cria (0.97)
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:52:39] "POST /upload HTTP/1.1" 200 -
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:52:39] "GET /static/results/processed_image_20250820_105239_photo.jpg?cb=1755697959275 HTTP/1.1" 200 -
+INFO:__main__:Imagem salva em: /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_105342_photo.jpg
+INFO:__main__:Iniciando processamento da imagem: /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_105342_photo.jpg
+
+image 1/1 /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_105342_photo.jpg: 640x480 1 junta_cria, 63.5ms
+Speed: 2.5ms preprocess, 63.5ms inference, 1.0ms postprocess per image at shape (1, 3, 640, 480)
+INFO:__main__:Imagem processada e salva em: /home/fifo/Área de trabalho/docker-agro-master/static/results/processed_image_20250820_105342_photo.jpg
+WARNING ⚠️ 'result.tojson()' is deprecated, replace with 'result.to_json()'.
+INFO:__main__:Peça com maior confiança: junta_cria (0.97)
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:53:42] "POST /upload HTTP/1.1" 200 -
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:53:42] "GET /static/results/processed_image_20250820_105342_photo.jpg?cb=1755698022463 HTTP/1.1" 200 -
+INFO:__main__:Imagem salva em: /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_105355_photo.jpg
+INFO:__main__:Iniciando processamento da imagem: /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_105355_photo.jpg
+
+image 1/1 /home/fifo/Área de trabalho/docker-agro-master/static/uploads/image_20250820_105355_photo.jpg: 640x480 1 junta_cria, 54.0ms
+Speed: 3.0ms preprocess, 54.0ms inference, 2.7ms postprocess per image at shape (1, 3, 640, 480)
+INFO:__main__:Imagem processada e salva em: /home/fifo/Área de trabalho/docker-agro-master/static/results/processed_image_20250820_105355_photo.jpg
+WARNING ⚠️ 'result.tojson()' is deprecated, replace with 'result.to_json()'.
+INFO:__main__:Peça com maior confiança: junta_cria (0.97)
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:53:55] "POST /upload HTTP/1.1" 200 -
+INFO:werkzeug:10.64.101.33 - - [20/Aug/2025 10:53:55] "GET /static/results/processed_image_20250820_105355_photo.jpg?cb=1755698035862 HTTP/1.1" 200 -

@@ -1,0 +1,176 @@
+/* General Styles */
+body {
+    font-family: 'Maven Pro', sans-serif;
+    background-color: #f4f7f6;
+}
+
+/* Header / Company Logo */
+.company-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+
+.company-logo {
+    display: block;
+    margin: 0 auto;
+    width: 40vw;
+    max-width: 400px;
+    min-width: 120px;
+    height: auto;
+    transition: width 0.3s;
+}
+
+@media (max-width: 768px) {
+    .company-logo {
+        width: 70vw;
+        max-width: 160px;
+        min-width: 80px;
+    }
+}
+
+@media (max-width: 768px) {
+    .company-logo {
+        max-height: 160px;
+        width: 80%;
+    }
+    .card {
+        margin-bottom: 0.5rem;
+    }
+    .card-header {
+        padding: 0.5rem 0.5rem;
+        font-size: 1rem;
+    }
+    .carousel-item img {
+        height: 160px;
+    }
+    .upload-area {
+        padding: 0.75rem;
+    }
+    .container {
+        padding: 0 0.5rem;
+    }
+    .controls {
+        padding-top: 0.25rem;
+    }
+}
+
+/* Card Styles */
+.card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+    margin-bottom: 1rem;
+}
+
+.card-header {
+    /* Remove colored block - keep header neutral and centered */
+    background-color: transparent;
+    color: inherit;
+    border-bottom: none;
+    font-weight: 500;
+    text-align: center;
+    padding: 0.75rem 1.25rem;
+    border-top-left-radius: calc(0.5rem - 1px);
+    border-top-right-radius: calc(0.5rem - 1px);
+}
+
+/* Camera and Image Styles */
+.camera-container {
+    position: relative;
+    width: 100%;
+    max-width: 640px; /* Smaller camera view */
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 0.3rem;
+    /* removed black block - use a light neutral background */
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+#video, #result-img {
+    width: 100%;
+    height: auto;
+}
+
+/* Controls Styles */
+.controls {
+    padding-top: 0.5rem;
+}
+
+.btn {
+    margin: 0.25rem;
+    /* Using default bootstrap padding for non-lg buttons */
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: none; /* Removing hover effect */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading Overlay */
+.loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+/* Image History Carousel */
+.carousel {
+    margin-top: 2rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 300px;
+    object-fit: contain;
+    background-color: #f8f9fa;
+}
+
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+/* Upload Area */
+.upload-area {
+    border: 2px dashed #c8e6c9;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    text-align: center;
+    margin: 1rem 0;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: #FF0000;
+    background-color: #e8f5e9;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .btn {
+        /* width: 100%; */ /* This might be too much, let's keep it flexible */
+        margin: 0.25rem 0;
+    }
+}

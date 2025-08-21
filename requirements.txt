@@ -1,0 +1,8 @@
+flask
+werkzeug
+ultralytics
+opencv-python-headless
+numpy
+Pillow
+SQLAlchemy
+Flask-SQLAlchemy

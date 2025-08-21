@@ -1,0 +1,257 @@
+from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, url_for
+import os
+from werkzeug.utils import secure_filename
+import logging
+from datetime import datetime
+from models import db, ImageRecord
+from ultralytics import YOLO
+import cv2
+import numpy as np
+from PIL import Image
+import base64
+
+# Configuração do Flask
+app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limite de 16MB para upload
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///image_history.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize database
+db.init_app(app)
+with app.app_context():
+    db.create_all()
+
+# Carrega o modelo YOLO
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'best.pt')
+model = YOLO(MODEL_PATH)
+model.to('cpu')  # Força o uso da CPU
+
+# Configuração dos diretórios
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'uploads')
+RESULTS_FOLDER = os.path.join(BASE_DIR, 'static', 'results')
+
+# Criação dos diretórios se não existirem
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(RESULTS_FOLDER, exist_ok=True)
+
+# Configuração de logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Extensões permitidas
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def image_to_base64(image_path):
+    """
+    Converte uma imagem para base64
+    """
+    with open(image_path, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+    return encoded_string
+
+def process_image(image_path):
+    """
+    Processa a imagem usando o modelo YOLO e retorna o caminho da imagem com as detecções e os resultados
+    """
+    try:
+        # Fazer a predição com o modelo
+        results = model(image_path)
+        
+        # Obter a primeira predição
+        result = results[0]
+        
+        # Carregar a imagem original
+        img = cv2.imread(image_path)
+        
+        detected_piece = {
+            'name': None,
+            'confidence': 0
+        }
+        piece_info = {
+            'name': None,
+            'confidence': 0
+        }
+        
+        # Para cada detecção
+        for box in result.boxes:
+            # Obter coordenadas do box
+            x1, y1, x2, y2 = box.xyxy[0].cpu().numpy().astype(int)
+            
+            # Obter confiança e classe
+            confidence = float(box.conf[0].cpu())
+            class_id = int(box.cls[0].cpu())
+            class_name = result.names[class_id]
+            
+            # Atualizar a peça detectada se a confiança for maior
+            if confidence > highest_confidence:
+                highest_confidence = confidence
+                piece_info = {
+                    'name': class_name,
+                    'confidence': confidence
+                }
+            
+            # Desenhar retângulo
+            cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            
+            # Adicionar texto
+            label = f'{class_name} {confidence:.2f}'
+            cv2.putText(img, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        
+        # Salvar a imagem com as detecções
+        output_path = os.path.join(RESULTS_FOLDER, os.path.basename(image_path))
+        cv2.imwrite(output_path, img)
+        
+        return output_path, result.to_json(), piece_info
+    except Exception as e:
+        logger.error(f"Erro ao processar imagem com YOLO: {str(e)}")
+        return None
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    try:
+        if 'photo' not in request.files:
+            return jsonify({'error': 'Nenhuma foto enviada'}), 400
+        
+        file = request.files['photo']
+        
+        if file.filename == '':
+            return jsonify({'error': 'Nenhum arquivo selecionado'}), 400
+        
+        if not allowed_file(file.filename):
+            return jsonify({'error': 'Tipo de arquivo não permitido'}), 400
+
+        # Gera um nome único para o arquivo
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"image_{timestamp}_{secure_filename(file.filename)}"
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        
+        # Salva o arquivo
+        file.save(file_path)
+        logger.info(f"Imagem salva em: {file_path}")
+
+        # Processa a imagem
+        result_path, detection_results, detected_piece = process_image(file_path)
+        
+        if result_path is None:
+            return jsonify({'error': 'Erro ao processar imagem'}), 500
+
+        # Retorna o caminho relativo para o frontend
+        result_url = '/'.join(['static', 'results', os.path.basename(result_path)])
+        
+        # Salva o registro no banco de dados
+        image_record = ImageRecord(
+            original_image_path=os.path.join('static', 'uploads', filename),
+            processed_image_path=result_url,
+            filename=filename,
+            detection_results=detection_results  # Salva os resultados da detecção
+        )
+        db.session.add(image_record)
+        db.session.commit()
+        
+        # Get history from database
+        history = ImageRecord.query.order_by(ImageRecord.timestamp.desc()).all()
+        history_data = [{
+            'id': record.id,
+            'processed_image_path': record.processed_image_path,
+            'timestamp': record.timestamp.isoformat()
+        } for record in history]
+        
+        return jsonify({
+            'result_image': result_url,
+            'current_id': image_record.id,
+            'history': history_data,
+            'detected_piece': piece_info['name'],
+            'confidence': piece_info['confidence']
+        })
+
+    except Exception as e:
+        logger.error(f"Erro no upload: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('static', filename)
+
+@app.route('/image/<int:image_id>')
+def image_details(image_id):
+    image = ImageRecord.query.get_or_404(image_id)
+    return render_template('image_details.html', image=image)
+
+@app.route('/image/<int:image_id>/delete', methods=['POST'])
+def delete_image(image_id):
+    image = ImageRecord.query.get_or_404(image_id)
+    
+    # Delete the physical files
+    try:
+        if os.path.exists(image.original_image_path):
+            os.remove(os.path.join(BASE_DIR, image.original_image_path))
+        if os.path.exists(image.processed_image_path):
+            os.remove(os.path.join(BASE_DIR, image.processed_image_path))
+    except Exception as e:
+        logger.error(f"Error deleting image files: {str(e)}")
+    
+    # Delete the database record
+    db.session.delete(image)
+    db.session.commit()
+    
+    return redirect(url_for('index'))
+
+@app.route('/api/modelo', methods=['POST'])
+def process_image_api():
+    try:
+        if 'image' not in request.files:
+            return jsonify({'error': 'Nenhuma imagem enviada'}), 400
+        
+        file = request.files['image']
+        
+        if file.filename == '':
+            return jsonify({'error': 'Nenhum arquivo selecionado'}), 400
+        
+        if not allowed_file(file.filename):
+            return jsonify({'error': 'Tipo de arquivo não permitido'}), 400
+
+        # Gera um nome único para o arquivo
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"image_{timestamp}_{secure_filename(file.filename)}"
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        
+        # Salva o arquivo
+        file.save(file_path)
+        logger.info(f"Imagem salva em: {file_path}")
+
+        # Processa a imagem
+        result_path = process_image(file_path)
+        
+        if result_path is None:
+            return jsonify({'error': 'Erro ao processar imagem'}), 500
+
+        # Converte a imagem processada para base64
+        image_base64 = image_to_base64(result_path)
+        
+        # Remove os arquivos temporários
+        try:
+            os.remove(file_path)
+            os.remove(result_path)
+        except Exception as e:
+            logger.warning(f"Erro ao remover arquivos temporários: {str(e)}")
+
+        return jsonify({
+            'success': True,
+            'image_base64': image_base64
+        })
+
+    except Exception as e:
+        logger.error(f"Erro na API: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    logger.info("Iniciando servidor Flask...")
+    app.run(host='0.0.0.0', port=5051, debug=True)

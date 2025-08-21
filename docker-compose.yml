@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  agromerica-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: agromerica-api:latest
+    ports:
+      - "5052:5052"
+    environment:
+      - PORT=5052
+      - WORKERS=2
+    volumes:
+      - agromerica_db:/app/instance
+      - agromerica_uploads:/app/static/uploads
+      # If you prefer to mount models from the host to allow model updates without rebuild:
+      # - ./models:/app/models:ro
+    restart: unless-stopped
+
+volumes:
+  agromerica_db:
+  agromerica_uploads:
