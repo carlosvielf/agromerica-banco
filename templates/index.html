@@ -34,8 +34,13 @@
                                 <p class="text-muted mb-2">Envie uma foto para análise</p>
                                 <div class="upload-area">
                                     <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                                    <!-- Camera input fallback: opens device camera on browsers that use input capture -->
+                                    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;">
                                     <button id="uploadButton" class="btn btn-secondary">
                                         <i class="fas fa-upload me-2"></i>Enviar Foto
+                                    </button>
+                                    <button id="cameraButton" class="btn btn-secondary ms-1">
+                                        <i class="fas fa-camera me-2"></i>Tirar Foto
                                     </button>
                                 </div>
                             </div>
@@ -79,6 +84,18 @@
                 <span class="visually-hidden">Carregando...</span>
             </div>
             <h5 class="mt-3">Processando imagem...</h5>
+        </div>
+    </div>
+
+    <!-- Camera Modal / Overlay -->
+    <div id="cameraModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1100; align-items:center; justify-content:center;">
+        <div style="position:relative; width:100%; max-width:480px; margin:0 auto;">
+            <video id="cameraVideo" autoplay playsinline style="width:100%; height:auto; border-radius:8px; background:#000;"></video>
+            <canvas id="cameraCanvas" style="display:none;"></canvas>
+            <div style="display:flex; justify-content:center; gap:0.5rem; margin-top:0.5rem;">
+                <button id="captureButton" class="btn btn-success"> <i class="fas fa-circle-notch me-2"></i>Capturar</button>
+                <button id="closeCameraButton" class="btn btn-secondary">Fechar</button>
+            </div>
         </div>
     </div>
 

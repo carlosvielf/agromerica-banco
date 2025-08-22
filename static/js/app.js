@@ -5,6 +5,14 @@ const fileInput = document.getElementById('fileInput');
 const uploadButton = document.getElementById('uploadButton');
 const uploadArea = document.querySelector('.upload-area');
 const newPhoto = document.getElementById('newPhoto');
+const cameraButton = document.getElementById('cameraButton');
+// Camera modal elements (will use getUserMedia)
+const cameraModal = document.getElementById('cameraModal');
+const cameraVideo = document.getElementById('cameraVideo');
+const cameraCanvas = document.getElementById('cameraCanvas');
+const captureButton = document.getElementById('captureButton');
+const closeCameraButton = document.getElementById('closeCameraButton');
+let mediaStream = null;
 
 // Piece descriptions
 const pieceDescriptions = {
@@ -168,6 +176,91 @@ function showAlert(type, message) {
 
 // Event Listeners
 uploadButton.addEventListener('click', () => fileInput.click());
+// Camera flow using getUserMedia: open modal, show live preview, capture and upload
+async function openCamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        // If getUserMedia not available, fall back to camera input (file input with capture)
+        const camInput = document.getElementById('cameraInput');
+        if (camInput) {
+            camInput.click();
+        } else {
+            showAlert('danger', 'Câmera não suportada neste navegador.');
+        }
+        return;
+    }
+    try {
+        // Try requesting the rear camera when possible; fall back to any camera
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+        } catch (innerErr) {
+            console.warn('Could not open environment-facing camera, trying default camera.', innerErr);
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        }
+    } catch (err) {
+        console.error('Erro ao abrir câmera:', err);
+        // fallback to file input with capture
+        const camInput = document.getElementById('cameraInput');
+        if (camInput) {
+            camInput.click();
+        } else {
+            showAlert('danger', 'Não foi possível acessar a câmera. Verifique permissões.');
+        }
+        return;
+    }
+
+    cameraVideo.srcObject = mediaStream;
+    cameraVideo.play().catch(() => {});
+    if (cameraModal) cameraModal.style.display = 'flex';
+}
+
+function closeCamera() {
+    if (mediaStream) {
+        mediaStream.getTracks().forEach(t => t.stop());
+        mediaStream = null;
+    }
+    if (cameraVideo) {
+        cameraVideo.pause();
+        cameraVideo.srcObject = null;
+    }
+    if (cameraModal) cameraModal.style.display = 'none';
+}
+
+async function captureAndUpload() {
+    if (!cameraVideo) return;
+    const w = cameraVideo.videoWidth;
+    const h = cameraVideo.videoHeight;
+    if (!w || !h) {
+        showAlert('danger', 'A pré-visualização da câmera ainda não está pronta. Tente novamente.');
+        return;
+    }
+
+    cameraCanvas.width = w;
+    cameraCanvas.height = h;
+    const ctx = cameraCanvas.getContext('2d');
+    ctx.drawImage(cameraVideo, 0, 0, w, h);
+
+    cameraCanvas.toBlob(async (blob) => {
+        if (!blob) {
+            showAlert('danger', 'Erro ao capturar imagem.');
+            return;
+        }
+        loading.style.display = 'flex';
+        try {
+            const resized = await resizeImageFile(new File([blob], 'capture.jpg', { type: 'image/jpeg' }), 800, 800, 0.7);
+            await uploadImage(resized);
+        } catch (err) {
+            console.error('Erro ao processar/capturar foto:', err);
+            showAlert('danger', 'Erro ao processar a imagem antes do envio.');
+        } finally {
+            loading.style.display = 'none';
+            closeCamera();
+        }
+    }, 'image/jpeg', 0.9);
+}
+
+if (cameraButton) cameraButton.addEventListener('click', openCamera);
+if (closeCameraButton) closeCameraButton.addEventListener('click', closeCamera);
+if (captureButton) captureButton.addEventListener('click', captureAndUpload);
 
 // New Photo button: clear result and show upload controls again
 if (newPhoto) {
@@ -200,6 +293,26 @@ fileInput.addEventListener('change', async (e) => {
         }
     }
 });
+
+// cameraInput fallback handler (for browsers that open camera via file input capture)
+const cameraInput = document.getElementById('cameraInput');
+if (cameraInput) {
+    cameraInput.addEventListener('change', async (e) => {
+        if (e.target.files && e.target.files[0]) {
+            loading.style.display = 'flex';
+            const file = e.target.files[0];
+            try {
+                const resized = await resizeImageFile(file, 800, 800, 0.7);
+                await uploadImage(resized);
+            } catch (err) {
+                console.error('Erro ao redimensionar/enviar imagem (cameraInput):', err);
+                showAlert('danger', 'Erro ao processar a imagem antes do envio.');
+            } finally {
+                cameraInput.value = '';
+            }
+        }
+    });
+}
 
 // Drag and drop functionality
 uploadArea.addEventListener('dragover', (e) => {
