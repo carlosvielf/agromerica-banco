@@ -150,7 +150,7 @@ body {
 
 /* Upload Area */
 .upload-area {
-    border: 2px dashed #c8e6c9;
+    border: 2px dashed #ff000023;
     border-radius: 0.5rem;
     padding: 1.5rem;
     text-align: center;
@@ -160,7 +160,7 @@ body {
 
 .upload-area:hover {
     border-color: #FF0000;
-    background-color: #e8f5e9;
+    background-color: #ff000015;
 }
 
 /* Responsive Adjustments */
